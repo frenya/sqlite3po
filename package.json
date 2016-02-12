@@ -1,0 +1,29 @@
+{
+  "name": "sqlite3p",
+  "version": "1.0.0",
+  "description": "Promise based wrapper for the sqlite3 module",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frenya/sqlite3p.git"
+  },
+  "keywords": [
+    "sqlite",
+    "sqlite3",
+    "promise",
+    "bluebird"
+  ],
+  "author": "Frantisek Vymazal <frenya@f8.cz> (http://f8.cz)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/frenya/sqlite3p/issues"
+  },
+  "homepage": "https://github.com/frenya/sqlite3p#readme",
+  "dependencies": {
+    "bluebird": "^3.3.0",
+    "sqlite3": "^3.1.1"
+  }
+}
