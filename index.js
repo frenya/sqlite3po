@@ -39,6 +39,11 @@ Statement.prototype.eachAsync = eachAsync;
 Database.prototype.prepareAsync = prepareAsync;
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+// Add the lightweight ORM method to Database prototype
+
+require('./orm');
+
+// --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 // Custom method implementations
 
 /// Returns a Promise that is resolved with executed statement
