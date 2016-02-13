@@ -3,7 +3,8 @@
 var sqlite3 = require('sqlite3'),
     Database = sqlite3.Database,
     Statement = sqlite3.Statement,
-    Promise = require('bluebird');
+    Promise = require('bluebird'),
+    debug = require('debug')('sqlite3p');
 
 // Transparently pass the SQLite module on
 module.exports = sqlite3;
@@ -48,6 +49,11 @@ function runAsync() {
     var args = Array.prototype.slice.call(arguments, 0);
 
     return new Promise(function(resolve, reject) {
+        // Recommended by SQLite documentation
+        // (provide an empty array of "bind vars")
+        // NOTE: This doesnt work for Statement
+        // if (args.length === 1) args.push([]);
+        
         args.push(function(err) {
             if (err) {
                 reject(err);
@@ -55,6 +61,7 @@ function runAsync() {
             resolve(this);
         });
 
+        debug('Calling #run with params ' + JSON.stringify(args));
         me.run.apply(me, args);
     });
 
