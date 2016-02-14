@@ -15,6 +15,7 @@ function Dummy(text) {
 Dummy.prototype.serialize = function () {
     
     return {
+        id: this._id,
         text: this._text
     };
     
