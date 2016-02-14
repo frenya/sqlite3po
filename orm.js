@@ -38,7 +38,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
                 // The only way to do it is by invoking the deserialize() method!
                 rowData.id = stmt.lastID;
                 
-                return setCachedObject(rowData.id, me).deserialize(rowData);
+                return setCachedObject(rowData.id, me).deserialize(rowData, true);
             });
         }
 
@@ -55,10 +55,11 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
             
             // Remove row from db
             return performDelete(rowData).then(function (stmt) {
-                return me;
+                // Unset the id (via invoking the deserialize() method)
+                rowData.id = null;
+                return me.deserialize(rowData, true);
             });
             
-            // TODO: Unset the id (will require deserialization)
         }
         else {
             // Nothing needed, object was never stored
