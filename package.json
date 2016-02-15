@@ -1,27 +1,28 @@
 {
-  "name": "sqlite3p",
+  "name": "sqlite3po",
   "version": "1.0.0",
-  "description": "Promise based wrapper for the sqlite3 module",
+  "description": "Promise based wrapper for sqlite3 with lightweight ORM",
   "main": "index.js",
   "scripts": {
     "test": "mocha --recursive"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/frenya/sqlite3p.git"
+    "url": "git+https://github.com/frenya/sqlite3po.git"
   },
   "keywords": [
     "sqlite",
     "sqlite3",
     "promise",
-    "bluebird"
+    "bluebird",
+    "orm"
   ],
   "author": "Frantisek Vymazal <frenya@f8.cz> (http://f8.cz)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/frenya/sqlite3p/issues"
+    "url": "https://github.com/frenya/sqlite3po/issues"
   },
-  "homepage": "https://github.com/frenya/sqlite3p#readme",
+  "homepage": "https://github.com/frenya/sqlite3po",
   "dependencies": {
     "bluebird": "^3.3.0",
     "debug": "^2.2.0",
