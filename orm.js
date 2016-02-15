@@ -104,8 +104,14 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
     };
 
     function setCachedObject(id, obj) {
-        if (obj) _objectCache[id] = obj;
-        else delete _objectCache[id];
+        if (obj) {
+            debug('Caching new ' + Class.name + ' object with rowid ' + id);
+            _objectCache[id] = obj;
+        }
+        else {
+            debug('Deleting ' + Class.name + ' object with rowid ' + id);
+            delete _objectCache[id];
+        }
         
         return obj;
     }
