@@ -26,7 +26,7 @@ Dummy.prototype.deserialize = function (rowData) {
     this._id = rowData.id;
     this._text = rowData.text;
     
-    return Promise.resolve(this);
+    return this;
     
 };
 
