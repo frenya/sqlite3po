@@ -1,10 +1,11 @@
 {
   "name": "sqlite3po",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Promise based wrapper for sqlite3 with lightweight ORM",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --recursive"
+    "test": "mocha --recursive",
+    "cover": "istanbul cover _mocha --report html -- --recursive -R spec -t 5000"
   },
   "repository": {
     "type": "git",
