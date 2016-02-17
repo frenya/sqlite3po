@@ -4,7 +4,7 @@ var sqlite3 = require('sqlite3'),
     Database = sqlite3.Database,
     Statement = sqlite3.Statement,
     Promise = require('bluebird'),
-    debug = require('debug')('sqlite3p');
+    debug = require('debug')('sqlite3po');
 
 // Transparently pass the SQLite module on
 module.exports = sqlite3;

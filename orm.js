@@ -4,7 +4,7 @@ var sqlite3 = require('.'),
     Database = sqlite3.Database,
     Statement = sqlite3.Statement,
     Promise = require('bluebird'),
-    debug = require('debug')('sqlite3p:orm');
+    debug = require('debug')('sqlite3po:orm');
 
 Database.prototype.bindSchema = function (Class, table, attributes) {
 
