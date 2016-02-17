@@ -236,7 +236,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
         // Now that we have the table, prepare the DML statements
         _insertStatement = db.prepare(insertStatementSQL(table, attributes));
         _updateStatement = db.prepare(updateStatementSQL(table, attributes));
-        _deleteStatement = db.prepare(updateStatementSQL(table, attributes));
+        _deleteStatement = db.prepare(deleteStatementSQL(table, attributes));
         
         // The return value is irrelevant here
         return;
