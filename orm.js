@@ -213,6 +213,26 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
 
     }
 
+    function createStatementBasicSQL(table, attributes) {
+
+        return ['CREATE TABLE IF NOT EXISTS ' + table + ' (id INTEGER PRIMARY KEY)'].join(' ');
+
+    }
+
+    function createColumnStatementSequenceSQL(table, attributes) {
+
+        var colNames = Object.getOwnPropertyNames(attributes),
+            statements = [];
+
+        colNames.forEach(function (colName) {
+            var colDef = ['ALTER TABLE', table, 'ADD COLUMN', colName, attributes[colName]].join(' ');
+            var total = statements.push(colDef);
+        });
+
+        return statements;
+
+    }
+
     function insertStatementSQL(table, attributes) {
 
         // Prepare an array of column names and bind variable names
@@ -245,10 +265,17 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
     // Final initialization step
 
     // Create table and return
-    var _createStatement = createStatementSQL(table, attributes)
+    var _createStatement = createStatementBasicSQL(table, attributes)
     debug('Running statement ' + _createStatement);
           
     return db.runAsync(_createStatement).then(function () {
+        var columnStatements = createColumnStatementSequenceSQL(table, attributes);
+        return Promise.all(columnStatements.map(function (sql) {
+            // Adding the column may throw an error if it already exists
+            // Just log them and continue
+            return db.runAsync(sql).catch(function (err) { debug(err); });
+        }));
+    }).then(function () {
         // Now that we have the table, prepare the DML statements
         _insertStatement = db.prepare(insertStatementSQL(table, attributes));
         _updateStatement = db.prepare(updateStatementSQL(table, attributes));

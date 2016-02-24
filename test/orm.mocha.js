@@ -1,3 +1,4 @@
+/*global require, console, describe, it, before */
 'use strict';
 
 var assert = require('chai').assert,
@@ -57,6 +58,19 @@ describe('SQLite ORM', function () {
         
     });
     
+    it ('binds class with DB schema repeatedly', function (done) {
+
+        db.bindSchema(Dummy, 'dummy', { text: 'varchar(255)', number: 'integer' }).then(function () {
+            assert.isFunction(Dummy.get);
+            assert.isFunction(Dummy.all);
+            assert.isFunction(Dummy.prototype.save);
+            assert.isFunction(Dummy.prototype.delete);
+            assert.isFunction(Dummy.prototype.release);
+            done();
+        });
+
+    });
+
     it ('stores unit test objects', function (done) {
 
         var d1 = new Dummy('Bazinga 1'),
