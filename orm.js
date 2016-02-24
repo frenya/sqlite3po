@@ -85,6 +85,16 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
 
     };
     
+    Class.truncate = function () {
+      
+        return db.runAsync('DELETE FROM ' + table).then(function (stmt) {
+            // Clear the cache completely as no objects are now valid
+            Class.releaseAll();
+            return stmt;
+        });
+        
+    };
+    
     Class.prototype.release = function () {
 
         var me = this,
@@ -92,6 +102,12 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
 
         setCachedObject(rowData.id, undefined);
 
+    };
+
+    Class.releaseAll = function () {
+
+        _objectCache = {};
+        
     };
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
