@@ -144,12 +144,25 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
         return obj.deserialize(rowData);
 
     }
+    
+    Class.getById = function (id) {
+        
+        // Return the cached object if ready - wrapped in promise
+        var obj = getCachedObject(id);
+        if (obj) return Promise.resolve(obj);
+        
+        // Otherwise fetch the object from db
+        // (as a side-effect, object will be deserialized and cached)
+        return this.get(_selectByIdSQL, { $id: id });
+        
+    }
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
     // Supporting DB functions
 
     // Create reusable statements
     var _attributeNames = ['id'].concat(Object.getOwnPropertyNames(attributes)),
+        _selectByIdSQL = ['SELECT * FROM', table, 'WHERE id = $id'].join(' '),
         _insertStatement = null, //db.prepare(insertStatementSQL(table, attributes)),
         _updateStatement = null, //db.prepare(updateStatementSQL(table, attributes)),
         _deleteStatement = null; //db.prepare(updateStatementSQL(table, attributes));

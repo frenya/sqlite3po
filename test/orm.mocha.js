@@ -41,7 +41,7 @@ describe('SQLite ORM', function () {
     before(function (done) {
         db = new sqlite3.Database(':memory:');
         db.on('open', function () {
-           done(); 
+            done(); 
         });
     });
     
@@ -108,6 +108,38 @@ describe('SQLite ORM', function () {
             done();
         });
         
+    });
+    
+    it ('retrieves uncached unit test object by id', function (done) {
+
+        Dummy.releaseAll();
+        
+        Dummy.getById(2).then(function (d) {
+            assert.isObject(d);
+            assert.isNumber(d._id);
+            assert.equal(d._id, 2);
+            assert.equal(d._text, 'Bazinga 2');
+            done();
+        });
+        
+    });
+
+    it ('retrieves cached unit test object by id', function (done) {
+
+        // Object with id 2 should still be cached from previous unit test
+        // Check the debug log to verify (there should be only one "Caching" message)
+        //     ✓ retrieves unit test objects
+        //   sqlite3po:orm Caching new Dummy object with rowid 2 +9ms
+        //     ✓ retrieves uncached unit test object by id
+        //     ✓ retrieves cached unit test object by id
+        Dummy.getById(2).then(function (d) {
+            assert.isObject(d);
+            assert.isNumber(d._id);
+            assert.equal(d._id, 2);
+            assert.equal(d._text, 'Bazinga 2');
+            done();
+        });
+
     });
 
 });
