@@ -110,8 +110,14 @@ Your **class** will be extended with the following methods
 
 -	`get(queryString, [bindVariables])` - runs `db.getAsync` with the same arguments and returns a Promise
     that will eventually resolve to an instance of your class corresponding to the retrieved row
+-	`getById(id)` - first checks the object cache and if it finds the object there, returns a resolved
+    promise directly, otherwise calls the `get` method with appropriate sql statement. This method is
+    primarily intended for fast and easy traversing of to-one relations.
+    If, for some reason, you want to force the fetch from db, use the `get` method instead.
 -	`all(queryString, [bindVariables])` - runs `db.allAsync` with the same arguments and returns a Promise
     that will eventually resolve to an array of instances of your class corresponding to the retrieved rows
+-	`releaseAll` - empties the object cache (see `release`)
+-	`truncate` - deletes all rows from the table
 
 ```javascript
 Dummy.get('SELECT * FROM dummy').then(function (d) {
@@ -127,6 +133,8 @@ Your class **instances** will be extended with the following methods
 -   `save()` - serializes the instance and depending on the presence or absence of the `id` field
     either inserts or updates the db record. Returns a Promise that will eventually resolve `this`
 -   `delete()` - deleted the db record and calls `deserialize` with the `id` field set to `null`
+-   `release()` - removes the instance from object cache. By doing this the next `get` or `getById`
+    will create and return a new instance for the `id`
 
 
 ```javascript
@@ -139,4 +147,6 @@ d.save().then(function () {
 
 Please note: the deletion doesn't destroy the instance at all, just disconnects it from the db record.
 
+## Caching
 
+Every class has an object cache to make sure there's always only one instance for a given database row.
