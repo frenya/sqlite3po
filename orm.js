@@ -26,7 +26,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
         debug('Will save data ' + JSON.stringify(rowData));
 
         if (rowData.id) {
-            return performUpdate(rowData).then(function (stmt) {
+            return performUpdate(rowData).then(function () {
                 return me;
             });
         }
@@ -54,7 +54,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
             setCachedObject(rowData.id, undefined);
             
             // Remove row from db
-            return performDelete(rowData).then(function (stmt) {
+            return performDelete(rowData).then(function () {
                 // Unset the id (via invoking the deserialize() method)
                 rowData.id = null;
                 return me.deserialize(rowData, true);
@@ -117,7 +117,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
 
     function getCachedObject(id) { 
         return _objectCache[id]; 
-    };
+    }
 
     function setCachedObject(id, obj) {
         if (obj) {
@@ -155,7 +155,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
         // (as a side-effect, object will be deserialized and cached)
         return this.get(_selectByIdSQL, { $id: id });
         
-    }
+    };
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
     // Supporting DB functions
@@ -172,20 +172,21 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
         debug('Running statement ' + JSON.stringify(_insertStatement));
         return _insertStatement.runAsync(prepareBindVars(rowData));
 
-    };
+    }
 
     function performUpdate(rowData) {
 
         debug('Running statement ' + JSON.stringify(_updateStatement));
         return _updateStatement.runAsync(prepareBindVars(rowData));
 
-    };
+    }
 
     function performDelete(rowData) {
 
+        debug('Running statement ' + JSON.stringify(_deleteStatement));
         return _deleteStatement.runAsync(prepareBindVars(rowData));
 
-    };
+    }
 
     function prepareBindVars(rowData) {
 
@@ -200,7 +201,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
         debug('Binding variables ' + JSON.stringify(bindVars));
         return bindVars;
 
-    };
+    }
 
     function bindVarName(columnName) {
 
@@ -210,7 +211,8 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
     // SQL statements construction
-    
+
+    /*
     function createStatementSQL(table, attributes) {
 
         // Prepare an array of column names and bind variable names
@@ -225,8 +227,9 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
         return ['CREATE TABLE IF NOT EXISTS ', table, ' (', colDefs.join(', '), ')'].join('');
 
     }
-
-    function createStatementBasicSQL(table, attributes) {
+    */
+    
+    function createStatementBasicSQL(table /*, unused: attributes */) {
 
         return ['CREATE TABLE IF NOT EXISTS ' + table + ' (id INTEGER PRIMARY KEY)'].join(' ');
 
@@ -238,8 +241,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
             statements = [];
 
         colNames.forEach(function (colName) {
-            var colDef = ['ALTER TABLE', table, 'ADD COLUMN', colName, attributes[colName]].join(' ');
-            var total = statements.push(colDef);
+            statements.push(['ALTER TABLE', table, 'ADD COLUMN', colName, attributes[colName]].join(' '));
         });
 
         return statements;
@@ -268,7 +270,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
 
     }
 
-    function deleteStatementSQL(table, attributes) {
+    function deleteStatementSQL(table /*, unused: attributes */) {
 
         return ['DELETE FROM ', table, ' WHERE id = $id'].join('');
 
@@ -278,7 +280,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
     // Final initialization step
 
     // Create table and return
-    var _createStatement = createStatementBasicSQL(table, attributes)
+    var _createStatement = createStatementBasicSQL(table, attributes);
     debug('Running statement ' + _createStatement);
           
     return db.runAsync(_createStatement).then(function () {
@@ -298,5 +300,5 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
         return;
     });
 
-}
+};
 
