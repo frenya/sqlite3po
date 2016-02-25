@@ -110,6 +110,23 @@ describe('SQLite ORM', function () {
         
     });
     
+    it ('retrieves unit test objects via statement', function (done) {
+
+        var stmt = db.prepare('SELECT * FROM dummy');
+        
+        Dummy.all(stmt).then(function (ds) {
+            assert.lengthOf(ds, 4);
+            ds.forEach(function (d) {
+                assert.isObject(d);
+                assert.isString(d._text);
+                assert.isNumber(d._id);
+                assert.equal(d._text, 'Bazinga ' + d._id);
+            });
+            done();
+        });
+
+    });
+
     it ('retrieves uncached unit test object by id', function (done) {
 
         Dummy.releaseAll();
@@ -137,6 +154,32 @@ describe('SQLite ORM', function () {
             assert.isNumber(d._id);
             assert.equal(d._id, 2);
             assert.equal(d._text, 'Bazinga 2');
+            done();
+        });
+
+    });
+
+    it ('retrieves object via prepared statement', function (done) {
+
+        var stmt = db.prepare('SELECT * FROM dummy WHERE id = ?');
+        
+        Dummy.get(stmt, 3).then(function (d) {
+            assert.isObject(d);
+            assert.isNumber(d._id);
+            assert.equal(d._id, 3);
+            assert.equal(d._text, 'Bazinga 3');
+            done();
+        });
+
+    });
+
+    it ('retrieves object via sql', function (done) {
+
+        Dummy.get('SELECT * FROM dummy WHERE id = ?', 4).then(function (d) {
+            assert.isObject(d);
+            assert.isNumber(d._id);
+            assert.equal(d._id, 4);
+            assert.equal(d._text, 'Bazinga 4');
             done();
         });
 

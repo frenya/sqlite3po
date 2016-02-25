@@ -69,17 +69,62 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
     };
     
 
-    Class.get = function () {
+    /**
+     * Fetches one row via the given statement and returns 
+     * a corresponding deserialized object.
+     *
+     * @param{String|Statement}sqlOrStatement The statement to execute
+     *
+     * NOTE: The method accepts variable number of arguments. All of them
+     *       are passed on to the appropriate getAsync method.
+     *       The only reason the give the first argument a name is easier type testing.
+     */
+    Class.get = function (sqlOrStatement) {     // Name the first argument for easier type testing
 
-        return db.getAsync.apply(db, arguments).then(function (row) {
+        var rowPromise = null;
+        
+        // If the first argument is a Statement, we have to 
+        // call its getAsync method with the REMAINING arguments,
+        // otherwise call db.getAsync with ALL the arguments
+        if (sqlOrStatement instanceof Statement) {
+            var args = Array.prototype.slice.call(arguments, 1);
+            rowPromise = Statement.prototype.getAsync.apply(sqlOrStatement, args);
+        }
+        else {
+            rowPromise = Database.prototype.getAsync.apply(db, arguments);
+        }
+        
+        return rowPromise.then(function (row) {
             return deserialize(row);
         });
 
     };
 
-    Class.all = function () {
+    /**
+     * Fetches all rows via the given statement and returns 
+     * a corresponding array of deserialized objects.
+     *
+     * @param{String|Statement}sqlOrStatement The statement to execute
+     *
+     * NOTE: The method accepts variable number of arguments. All of them
+     *       are passed on to the appropriate allAsync method.
+     */
+    Class.all = function (sqlOrStatement) {     // Name the first argument for easier type testing
 
-        return db.allAsync.apply(db, arguments).then(function (rows) {
+        var rowPromise = null;
+
+        // If the first argument is a Statement, we have to 
+        // call its allAsync method with the REMAINING arguments,
+        // otherwise call db.allAsync with ALL the arguments
+        if (sqlOrStatement instanceof Statement) {
+            var args = Array.prototype.slice.call(arguments, 1);
+            rowPromise = Statement.prototype.allAsync.apply(sqlOrStatement, args);
+        }
+        else {
+            rowPromise = Database.prototype.allAsync.apply(db, arguments);
+        }
+
+        return rowPromise.then(function (rows) {
             return Promise.all(rows.map(deserialize));
         });
 
