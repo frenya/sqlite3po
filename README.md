@@ -128,6 +128,16 @@ Dummy.get('SELECT * FROM dummy').then(function (d) {
 
 Please note: Since version 1.1.0, you can also pass an instance of Statement as first argument to `get` and `all`
 
+```javascript
+var stmt = db.prepare('SELECT * FROM dummy WHERE id = ?');
+
+Dummy.get(stmt, 1).then(function (d) {
+	console.log(d);
+	// { id: 1, text: 'Bazinga' }
+});
+```
+
+
 ## Saving / Deleting
 
 Your class **instances** will be extended with the following methods
