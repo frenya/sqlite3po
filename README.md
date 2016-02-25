@@ -126,6 +126,8 @@ Dummy.get('SELECT * FROM dummy').then(function (d) {
 });
 ```
 
+Please note: Since version 1.1.0, you can also pass an instance of Statement as first argument to `get` and `all`
+
 ## Saving / Deleting
 
 Your class **instances** will be extended with the following methods
