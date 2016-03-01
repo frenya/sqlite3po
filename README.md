@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/frenya/sqlite3po.svg?branch=master)](https://travis-ci.org/frenya/sqlite3po)
+
 # Extended SQLite API
 
 This module extends SQLite3's Database and Statement classes with promise-based methods.
