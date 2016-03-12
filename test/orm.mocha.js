@@ -125,17 +125,17 @@ describe('SQLite ORM', function () {
 
     it ('retrieves unit test objects via statement', function (done) {
 
-        var stmt = db.prepare('SELECT * FROM dummy');
-
-        Dummy.all(stmt).then(function (ds) {
-            assert.lengthOf(ds, 4);
-            ds.forEach(function (d) {
-                assert.isObject(d);
-                assert.isString(d._text);
-                assert.isNumber(d._id);
-                assert.equal(d._text, 'Bazinga ' + d._id);
+        db.prepareAsync('SELECT * FROM dummy').then(function (stmt) {
+            Dummy.all(stmt).then(function (ds) {
+                assert.lengthOf(ds, 4);
+                ds.forEach(function (d) {
+                    assert.isObject(d);
+                    assert.isString(d._text);
+                    assert.isNumber(d._id);
+                    assert.equal(d._text, 'Bazinga ' + d._id);
+                });
+                done();
             });
-            done();
         });
 
     });
@@ -192,7 +192,7 @@ describe('SQLite ORM', function () {
 
     });
 
-    
+
 
     it ('retrieves object via prepared statement', function (done) {
 
