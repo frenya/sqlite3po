@@ -17,7 +17,8 @@ Dummy.prototype.serialize = function () {
 
     return {
         id: this._id,
-        text: this._text
+        text: this._text,
+        number: this._number
     };
 
 };
@@ -26,6 +27,8 @@ Dummy.prototype.deserialize = function (rowData) {
 
     this._id = rowData.id;
     this._text = rowData.text;
+    this._number = rowData.number;
+
     return this;
 
 };
@@ -154,6 +157,26 @@ describe('SQLite ORM', function () {
             assert.equal(d._id, 2);
             assert.equal(d._text, 'Bazinga 2');
             done();
+        });
+
+    });
+
+    it ('correctly stores object updates', function (done) {
+
+        // Object with id 2 should still be cached from previous unit test
+        Dummy.getById(2).then(function (dd) {
+            dd._number = 90210;
+            dd.save().then(function () {
+                // Verify the content fetched from db
+                Dummy.get('SELECT * FROM dummy WHERE id = ?', 2).then(function (d) {
+                    assert.isObject(d);
+                    assert.isNumber(d._id);
+                    assert.equal(d._id, 2);
+                    assert.equal(d._text, 'Bazinga 2');
+                    assert.equal(d._number, 90210);
+                    done();
+                });
+            });
         });
 
     });
