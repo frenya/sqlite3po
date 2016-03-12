@@ -11,12 +11,12 @@ The returned Promise resolves to
 -	the executed statement - case of `runAsync`
 -	number of processed rows - case of `eachAsync`
 
-Please note: In `eachAsync` the Promise replaces the second callback to `each`. 
+Please note: In `eachAsync` the Promise replaces the second callback to `each`.
 The first callback (row callback) should still be provided and will be invoked normally.
 
 # Lightweight ORM
 
-The ORM in `sqlite3po` takes a different approach than most ORM implementations do. 
+The ORM in `sqlite3po` takes a different approach than most ORM implementations do.
 In a nutshell:
 
 -	it doesn't define your classes, it simply extends your existing classes
@@ -25,7 +25,7 @@ In a nutshell:
     instead it lets you control the mapping by calling methods for (de)serialization (see below)
 -	it doesn't create a custom set of query methods to simulate SQL,
     instead it lets you use SQL directly
-    
+
 ## Bind your class with a db table
 
 See the following code snippet
@@ -56,7 +56,7 @@ The `bindSchema(Class, tableName, tableAttributes)` method actually does a coupl
 -	it extends your class with the API methods (see below)
 -	it creates an empty cache of fetched objects so that there's always only one instance of `Class`
     with a given `id`
-    
+
 Please note: `bindSchema` will throw and exception if `tableAttributes` contains a property named `id`!
 
 ## Serialization
@@ -92,9 +92,9 @@ Dummy.prototype.deserialize = function (rowData) {
     return this;
 };
 ```
-    
-The method is called any time new data is fetched from database. It receives two arguments. The first 
-argument is always an object containing the fetched row. 
+
+The method is called any time new data is fetched from database. It receives two arguments. The first
+argument is always an object containing the fetched row.
 
 The second argument will be *truthy* when
 only the `id` property should be updated and you can (but don't have to) ignore the rest.
@@ -148,7 +148,6 @@ Your class **instances** will be extended with the following methods
 -   `release()` - removes the instance from object cache. By doing this the next `get` or `getById`
     will create and return a new instance for the `id`
 
-
 ```javascript
 var d = new Dummy('Bazinga');
 d.save().then(function () {
@@ -157,7 +156,16 @@ d.save().then(function () {
 });
 ```
 
-Please note: the deletion doesn't destroy the instance at all, just disconnects it from the db record.
+Please note:
+
+-   The deletion doesn't destroy the instance at all, just disconnects it from the db record,
+    i.e. nullifies the `id` field.
+-   There are legitimate cases where you would want to assign a particular `id`
+    to an object (e.g. when getting data from an API collection that already has a primary key).
+    The `save` method handles this correctly - i.e. tries to perform an UPDATE
+    first and when it fails (updates 0 records), it calls INSERT and stores a new record.  
+    (Bonus: If you name your db columns the same as the API collection, you
+    can use the `serialize`/`deserialize` methods for converting API data as well)
 
 ## Caching
 
