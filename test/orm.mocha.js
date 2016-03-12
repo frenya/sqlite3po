@@ -47,6 +47,17 @@ describe('SQLite ORM', function () {
         });
     });
 
+    it ('shoudn\'t bind class with DB schema containing id', function (done) {
+
+        try {
+            db.bindSchema(Dummy, 'dummy', { id: 'varchar(255)' });
+        }
+        catch (ex) {
+            done();
+        }
+
+    });
+
     it ('binds class with DB schema', function (done) {
 
         db.bindSchema(Dummy, 'dummy', { text: 'varchar(255)' }).then(function () {
