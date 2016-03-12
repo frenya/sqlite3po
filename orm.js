@@ -26,8 +26,19 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
         debug('Will save data ' + JSON.stringify(rowData));
 
         if (rowData.id) {
-            return performUpdate(rowData).then(function () {
-                return me;
+            return performUpdate(rowData).then(function (stmt) {
+                if (stmt.changes === 0) {
+                    // No rows were changed by the update command,
+                    // i.e. no row exists with the given id and
+                    // we need to create one
+                    return performInsert(rowData).then(function (stmt) {
+                        debug('Inserted row with rowid ' + stmt.lastID);
+
+                        // No assignment, deserialization or caching necessary
+                        return me;
+                    });
+                }
+                else return me;
             });
         }
         else {
@@ -299,7 +310,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
         var colNames = Object.getOwnPropertyNames(attributes),
             bindVars = colNames.map(bindVarName);
 
-        return ['INSERT INTO ', table, ' (', colNames.join(', '), ') VALUES (', bindVars.join(', '), ')'].join('');
+        return ['INSERT INTO ', table, ' (id, ', colNames.join(', '), ') VALUES ($id, ', bindVars.join(', '), ')'].join('');
 
     }
 

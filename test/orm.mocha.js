@@ -184,4 +184,22 @@ describe('SQLite ORM', function () {
 
     });
 
+    it ('handles assigned value of id', function (done) {
+
+        var d = new Dummy();
+
+        // By doing this, I'm am assigning an id that does not exist in DB
+        // ergo, the UPDATE command will fail
+        d.deserialize({ id: 123456, text: 'Bazinga 123456' });
+
+        d.save().then(function (ds) {
+            assert.isObject(ds);
+            assert.isNumber(ds._id);
+            assert.equal(ds._id, 123456);
+            assert.equal(ds._text, 'Bazinga 123456');
+            done();
+        });
+        
+    });
+
 });
