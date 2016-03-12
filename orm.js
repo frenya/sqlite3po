@@ -200,7 +200,8 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
         return obj.deserialize(rowData);
 
     }
-    
+    Class.deserialize = deserialize;
+
     Class.getById = function (id) {
 
         // Return the cached object if ready - wrapped in promise
