@@ -240,7 +240,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
     function performDelete(rowData) {
 
         debug('Running statement ' + JSON.stringify(_deleteStatement));
-        return _deleteStatement.runAsync(prepareBindVars(rowData));
+        return _deleteStatement.runAsync({ '$id': rowData.id });
 
     }
 
