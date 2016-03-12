@@ -140,6 +140,39 @@ describe('SQLite ORM', function () {
 
     });
 
+    // This does not test the ORM really, but it's here to benefit
+    // from the test data that's ready
+    it ('traverses all rows with Database.eachAsync', function (done) {
+
+        var rows = ['Bazinga Zero'];
+
+        function processRow(err, row) {
+            assert.isNull(err);
+            assert.isObject(row);
+            assert.isNumber(row.id);
+            assert.isString(row.text);
+            rows[row.id] = row.text;
+        }
+
+        db.eachAsync('SELECT * FROM dummy', processRow).then(function (count) {
+            assert.equal(count, 4);
+            assert.deepEqual(rows, ['Bazinga Zero', 'Bazinga 1', 'Bazinga 2', 'Bazinga 3', 'Bazinga 4']);
+            done();
+        });
+
+    });
+
+    it ('traverses all rows with Statement.eachAsync', function (done) {
+
+        db.prepareAsync('SELECT * FROM dummy').then(function (stmt) {
+            stmt.eachAsync().then(function (count) {
+                assert.equal(count, 4);
+                done();
+            });
+        });
+        
+    });
+
     it ('retrieves uncached unit test object by id', function (done) {
 
         Dummy.releaseAll();
