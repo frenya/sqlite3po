@@ -12,17 +12,17 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
     if (attributes.hasOwnProperty('id')) throw new Error('Class must not contain an attribute named \'id\'');
 
     var db = this;
-    
+
     debug('Binding class ' + Class + ' with table ' + table + ' with attributes ' + JSON.stringify(attributes));
-    
+
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
     // Main DB access and manipulation methods
-    
+
     Class.prototype.save = function () {
 
         var me = this,
             rowData = me.serialize();
-        
+
         debug('Will save data ' + JSON.stringify(rowData));
 
         if (rowData.id) {
@@ -33,44 +33,44 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
         else {
             return performInsert(rowData).then(function (stmt) {
                 debug('Inserted row with rowid ' + stmt.lastID);
-                
+
                 // New row was inserted, we need to update the id
                 // The only way to do it is by invoking the deserialize() method!
                 rowData.id = stmt.lastID;
-                
+
                 return setCachedObject(rowData.id, me).deserialize(rowData, true);
             });
         }
 
     };
-    
+
     Class.prototype.delete = function () {
-        
+
         var me = this,
             rowData = me.serialize();
 
         if (rowData.id) {
             // Remove object from cache
             setCachedObject(rowData.id, undefined);
-            
+
             // Remove row from db
             return performDelete(rowData).then(function () {
                 // Unset the id (via invoking the deserialize() method)
                 rowData.id = null;
                 return me.deserialize(rowData, true);
             });
-            
+
         }
         else {
             // Nothing needed, object was never stored
             return Promise.resolve(me);
         }
-        
+
     };
-    
+
 
     /**
-     * Fetches one row via the given statement and returns 
+     * Fetches one row via the given statement and returns
      * a corresponding deserialized object.
      *
      * @param{String|Statement}sqlOrStatement The statement to execute
@@ -82,8 +82,8 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
     Class.get = function (sqlOrStatement) {     // Name the first argument for easier type testing
 
         var rowPromise = null;
-        
-        // If the first argument is a Statement, we have to 
+
+        // If the first argument is a Statement, we have to
         // call its getAsync method with the REMAINING arguments,
         // otherwise call db.getAsync with ALL the arguments
         if (sqlOrStatement instanceof Statement) {
@@ -93,7 +93,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
         else {
             rowPromise = Database.prototype.getAsync.apply(db, arguments);
         }
-        
+
         return rowPromise.then(function (row) {
             return deserialize(row);
         });
@@ -101,7 +101,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
     };
 
     /**
-     * Fetches all rows via the given statement and returns 
+     * Fetches all rows via the given statement and returns
      * a corresponding array of deserialized objects.
      *
      * @param{String|Statement}sqlOrStatement The statement to execute
@@ -113,7 +113,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
 
         var rowPromise = null;
 
-        // If the first argument is a Statement, we have to 
+        // If the first argument is a Statement, we have to
         // call its allAsync method with the REMAINING arguments,
         // otherwise call db.allAsync with ALL the arguments
         if (sqlOrStatement instanceof Statement) {
@@ -129,17 +129,17 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
         });
 
     };
-    
+
     Class.truncate = function () {
-      
+
         return db.runAsync('DELETE FROM ' + table).then(function (stmt) {
             // Clear the cache completely as no objects are now valid
             Class.releaseAll();
             return stmt;
         });
-        
+
     };
-    
+
     Class.prototype.release = function () {
 
         var me = this,
@@ -152,7 +152,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
     Class.releaseAll = function () {
 
         _objectCache = {};
-        
+
     };
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -160,8 +160,8 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
 
     var _objectCache = {};
 
-    function getCachedObject(id) { 
-        return _objectCache[id]; 
+    function getCachedObject(id) {
+        return _objectCache[id];
     }
 
     function setCachedObject(id, obj) {
@@ -173,7 +173,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
             debug('Deleting ' + Class.name + ' object with rowid ' + id);
             delete _objectCache[id];
         }
-        
+
         return obj;
     }
 
@@ -191,15 +191,15 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
     }
     
     Class.getById = function (id) {
-        
+
         // Return the cached object if ready - wrapped in promise
         var obj = getCachedObject(id);
         if (obj) return Promise.resolve(obj);
-        
+
         // Otherwise fetch the object from db
         // (as a side-effect, object will be deserialized and cached)
         return this.get(_selectByIdSQL, { $id: id });
-        
+
     };
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -273,7 +273,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
 
     }
     */
-    
+
     function createStatementBasicSQL(table /*, unused: attributes */) {
 
         return ['CREATE TABLE IF NOT EXISTS ' + table + ' (id INTEGER PRIMARY KEY)'].join(' ');
@@ -327,7 +327,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
     // Create table and return
     var _createStatement = createStatementBasicSQL(table, attributes);
     debug('Running statement ' + _createStatement);
-          
+
     return db.runAsync(_createStatement).then(function () {
         var columnStatements = createColumnStatementSequenceSQL(table, attributes);
         return Promise.all(columnStatements.map(function (sql) {
@@ -340,10 +340,9 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
         _insertStatement = db.prepare(insertStatementSQL(table, attributes));
         _updateStatement = db.prepare(updateStatementSQL(table, attributes));
         _deleteStatement = db.prepare(deleteStatementSQL(table, attributes));
-        
+
         // The return value is irrelevant here
         return;
     });
 
 };
-

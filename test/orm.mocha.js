@@ -8,27 +8,26 @@ var assert = require('chai').assert,
 // Unit test object class
 
 function Dummy(text) {
-    
+
     this._text = text;
-    
+
 }
 
 Dummy.prototype.serialize = function () {
-    
+
     return {
         id: this._id,
         text: this._text
     };
-    
+
 };
 
 Dummy.prototype.deserialize = function (rowData) {
-    
+
     this._id = rowData.id;
     this._text = rowData.text;
-    
     return this;
-    
+
 };
 
 // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -41,12 +40,12 @@ describe('SQLite ORM', function () {
     before(function (done) {
         db = new sqlite3.Database(':memory:');
         db.on('open', function () {
-            done(); 
+            done();
         });
     });
-    
+
     it ('binds class with DB schema', function (done) {
-    
+
         db.bindSchema(Dummy, 'dummy', { text: 'varchar(255)' }).then(function () {
             assert.isFunction(Dummy.get);
             assert.isFunction(Dummy.all);
@@ -55,9 +54,9 @@ describe('SQLite ORM', function () {
             assert.isFunction(Dummy.prototype.release);
             done();
         });
-        
+
     });
-    
+
     it ('binds class with DB schema repeatedly', function (done) {
 
         db.bindSchema(Dummy, 'dummy', { text: 'varchar(255)', number: 'integer' }).then(function () {
@@ -77,7 +76,7 @@ describe('SQLite ORM', function () {
             d2 = new Dummy('Bazinga 2'),
             d3 = new Dummy('Bazinga 3'),
             d4 = new Dummy('Bazinga 4');
-        
+
         Promise.all([
             d1.save(),
             d2.save(),
@@ -96,7 +95,7 @@ describe('SQLite ORM', function () {
     });
 
     it ('retrieves unit test objects', function (done) {
-        
+
         Dummy.all('SELECT * FROM dummy').then(function (ds) {
             assert.lengthOf(ds, 4);
             ds.forEach(function (d) {
@@ -107,13 +106,13 @@ describe('SQLite ORM', function () {
             });
             done();
         });
-        
+
     });
-    
+
     it ('retrieves unit test objects via statement', function (done) {
 
         var stmt = db.prepare('SELECT * FROM dummy');
-        
+
         Dummy.all(stmt).then(function (ds) {
             assert.lengthOf(ds, 4);
             ds.forEach(function (d) {
@@ -130,7 +129,7 @@ describe('SQLite ORM', function () {
     it ('retrieves uncached unit test object by id', function (done) {
 
         Dummy.releaseAll();
-        
+
         Dummy.getById(2).then(function (d) {
             assert.isObject(d);
             assert.isNumber(d._id);
@@ -138,7 +137,7 @@ describe('SQLite ORM', function () {
             assert.equal(d._text, 'Bazinga 2');
             done();
         });
-        
+
     });
 
     it ('retrieves cached unit test object by id', function (done) {
@@ -162,7 +161,7 @@ describe('SQLite ORM', function () {
     it ('retrieves object via prepared statement', function (done) {
 
         var stmt = db.prepare('SELECT * FROM dummy WHERE id = ?');
-        
+
         Dummy.get(stmt, 3).then(function (d) {
             assert.isObject(d);
             assert.isNumber(d._id);
