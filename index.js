@@ -58,7 +58,7 @@ function runAsync() {
         // (provide an empty array of "bind vars")
         // NOTE: This doesnt work for Statement
         // if (args.length === 1) args.push([]);
-        
+
         args.push(function(err) {
             if (err) {
                 reject(err);
@@ -76,7 +76,7 @@ function runAsync() {
 /// (i.e. the value passed to the COMPLETION callback)
 ///
 /// The ROW callback should be still provided and is normally executed.
-/// If it is not provided (which frankly doesn't make any sense), 
+/// If it is not provided (which frankly doesn't make any sense),
 /// an empty function is passed to the `each` method.
 function eachAsync() {
 
@@ -94,10 +94,8 @@ function eachAsync() {
 
         // completion callback
         args.push(function(err, num) {
-            if (err) {
-                reject(err);
-            }
-            resolve(num);
+            if (err) reject(err);
+            else resolve(num);
         });
         me.each.apply(me, args);
 
@@ -107,21 +105,18 @@ function eachAsync() {
 
 /// Returns a Promise that is resolved with the prepared Statement
 function prepareAsync() {
-    
+
     var me = this;
     var args = Array.prototype.slice.call(arguments, 0);
     var statement;
 
     return new Promise(function(resolve, reject) {
         args.push(function(err) {
-            if (err) {
-                reject(err);
-            }
-            resolve(statement);
+            if (err) reject(err);
+            else resolve(statement);
         });
 
         statement = me.prepare.apply(me, args);
     });
-    
-}
 
+}
