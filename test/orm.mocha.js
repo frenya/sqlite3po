@@ -181,6 +181,8 @@ describe('SQLite ORM', function () {
 
     });
 
+    
+
     it ('retrieves object via prepared statement', function (done) {
 
         var stmt = db.prepare('SELECT * FROM dummy WHERE id = ?');
@@ -222,7 +224,54 @@ describe('SQLite ORM', function () {
             assert.equal(ds._text, 'Bazinga 123456');
             done();
         });
-        
+
+    });
+
+    it ('should correctly handle object deletion', function (done) {
+
+        var dummy = new Dummy('Bazinga 5'),
+            countSQL = 'SELECT count(*) AS count FROM dummy',
+            rowCount;
+
+        db.getAsync(countSQL).then(function (count) {
+            rowCount = count.count;
+            return dummy.delete()
+        }).then(function (d) {
+            // Object is not yet in the db, so nothing to be done here
+            assert.isObject(d);
+            assert.isUndefined(d._id);
+        }).then(function () {
+            // Save object and make sure it gets an ID
+            return dummy.save();
+        }).then(function (d) {
+            assert.isObject(d);
+            assert.isNumber(d._id);
+
+            // Now delete the object
+            return d.delete();
+        }).then(function (d) {
+            assert.isObject(d);
+            assert.isNull(d._id);
+
+            return db.getAsync(countSQL);
+        }).then(function (count) {
+            // Make sure count of rows is the same
+            assert.equal(count.count, rowCount);
+            done();
+        });
+
+    });
+
+    it ('should correctly handle table truncation', function (done) {
+
+        Dummy.truncate().then(function () {
+            return Dummy.get('SELECT * FROM dummy');
+        }).then(function (d) {
+            // Nothing should be returned here
+            assert.isUndefined(d);
+            done();
+        });
+
     });
 
 });
