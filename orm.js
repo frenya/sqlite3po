@@ -6,10 +6,22 @@ var sqlite3 = require('.'),
     Promise = require('bluebird'),
     debug = require('debug')('sqlite3po:orm');
 
+var IPK = 'INTEGER PRIMARY KEY',
+    IPKA = 'INTEGER PRIMARY KEY AUTOINCREMENT';
+
 Database.prototype.bindSchema = function (Class, table, attributes) {
 
+    var idColumnType = IPK;
+
     // Sanity check - make sure we can use 'id' as primary key
-    if (attributes.hasOwnProperty('id')) throw new Error('Class must not contain an attribute named \'id\'');
+    if (attributes.hasOwnProperty('id')) {
+        var colType = attributes['id'].toUpperCase();
+
+        if ((colType !== IPK) && (colType !== IPKA)) {
+            throw new Error('Column \'id\' must be of type ' + IPK + ' or ' + IPKA);
+        }
+        else idColumnType = colType;
+    }
 
     var db = this;
 
@@ -288,7 +300,7 @@ Database.prototype.bindSchema = function (Class, table, attributes) {
 
     function createStatementBasicSQL(table /*, unused: attributes */) {
 
-        return ['CREATE TABLE IF NOT EXISTS ' + table + ' (id INTEGER PRIMARY KEY)'].join(' ');
+        return ['CREATE TABLE IF NOT EXISTS', table, '(id', idColumnType, ')'].join(' ');
 
     }
 
