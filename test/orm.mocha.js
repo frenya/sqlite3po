@@ -170,7 +170,7 @@ describe('SQLite ORM', function () {
                 done();
             });
         });
-        
+
     });
 
     it ('retrieves uncached unit test object by id', function (done) {
@@ -279,7 +279,7 @@ describe('SQLite ORM', function () {
 
         db.getAsync(countSQL).then(function (count) {
             rowCount = count.count;
-            return dummy.delete()
+            return dummy.delete();
         }).then(function (d) {
             // Object is not yet in the db, so nothing to be done here
             assert.isObject(d);
