@@ -26,7 +26,7 @@
   "homepage": "https://github.com/frenya/sqlite3po",
   "dependencies": {
     "bluebird": "^3.3.0",
-    "debug": "^2.2.0",
+    "debug": "^2.6.9",
     "sqlite3": "^4.1.0"
   },
   "devDependencies": {
